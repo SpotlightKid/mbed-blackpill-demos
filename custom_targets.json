@@ -1,0 +1,33 @@
+{
+   "BLACKPILL_F411CE": {
+        "inherits": ["MCU_STM32F4"],
+        "macros_add": [
+            "STM32F411xE",
+            "HSE_VALUE=25000000"
+        ],
+        "extra_labels_add": [
+            "STM32F411xE",
+            "STM32F411CE",
+            "BLACKPILL"
+        ],
+        "components_add": [
+            "FLASHIAP"
+        ],
+        "detect_code": ["df11"],
+        "default_toolchain": "GCC_ARM",
+        "config": {
+            "hse_value": {
+                "value": "25000000",
+                "macro_name": "HSE_VALUE"
+            }
+        },
+        "overrides": {
+            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
+        },
+        "release_versions": [
+            "6"
+        ],
+        "device_name": "STM32F411CEUx",
+        "bootloader_supported": true
+    }
+}

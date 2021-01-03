@@ -1,0 +1,14 @@
+{
+    "requires": ["bare-metal", "events", "rtos-api"],
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate"          : 115200,
+            "platform.stdio-convert-newlines"   : true,
+            "platform.stdio-buffered-serial"    : true,
+            "platform.stdio-flush-at-exit"      : true,
+            "platform.callback-nontrivial"      : true,
+            "target.tickless-from-us-ticker"    : true,
+            "target.c_lib"                      : "small"
+        }
+    }
+}
