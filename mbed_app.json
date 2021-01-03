@@ -9,6 +9,10 @@
             "target.c_lib": "small",
             "target.custom-tickers": false,
             "target.printf_lib": "minimal-printf"
+        },
+        "BLACKPILL_F411CE": {
+            "target.stdio_uart_tx": "PA_9",
+            "target.stdio_uart_rx": "PA_10"
         }
     }
 }
