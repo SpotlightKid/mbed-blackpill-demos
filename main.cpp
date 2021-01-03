@@ -1,17 +1,22 @@
 #include "mbed.h"
 #include "mbed_events.h"
+#include "PinDetect.h"
 
 DigitalOut  led1(LED_BLUE);
-InterruptIn button(BUTTON1, PullUp);
-EventQueue  queue;
+PinDetect   btn(USER_BUTTON);
 
-void on_button_released(void) {
-    printf("Button released\r\n");
+void btn_pressed(void) {
+    printf("Button pressed\r\n");
     led1 = !led1;
 }
 
 int main() {
-    led1 = 1;
-    button.rise(queue.event(on_button_released));
-    queue.dispatch_forever();
+    // Request the shared queue
+    EventQueue *queue = mbed_event_queue();
+
+    btn.mode(PullUp);
+    btn.attach_asserted(queue->event(btn_pressed));
+    btn.setSamplesTillAssert(3);
+    btn.setSampleFrequency();
+    queue->dispatch_forever();
 }
