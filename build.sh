@@ -16,4 +16,4 @@ if [[ -n "${PROFILE}" ]]; then
     fi
 fi
 
-exec mbed compile -m ${TARGET:-BLACKPILL_F411CE} -t ${TOOLCHAIN:-GCC_ARM} "${PROFILE_OPT}" "$@"
+exec mbed compile -m ${TARGET:-BLACKPILL_F411CE} -t ${TOOLCHAIN:-GCC_ARM} ${PROFILE_OPT} "$@"
