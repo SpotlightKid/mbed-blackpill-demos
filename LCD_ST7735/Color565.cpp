@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // LCD_ST7735 - Driver for ST7735 LCD display controller
 // Author: Chris Taylor (taylorza)
-#include "mbed.h"
+
 #include "Color565.h"
 
 const uint16_t Color565::White = Color565::fromRGB(0xff, 0xff, 0xff);
