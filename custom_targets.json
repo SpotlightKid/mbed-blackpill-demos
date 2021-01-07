@@ -25,6 +25,7 @@
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
         },
         "release_versions": [
+            "5",
             "6"
         ],
         "device_name": "STM32F411CEUx",
