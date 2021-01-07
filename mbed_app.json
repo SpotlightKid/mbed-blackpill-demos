@@ -1,12 +1,11 @@
 {
-    "requires": ["bare-metal", "events", "rtos-api"],
     "target_overrides": {
         "*": {
             "platform.callback-nontrivial": true,
             "platform.stdio-baud-rate": 115200,
+            "platform.default-serial-baud-rate": 115200,
             "platform.stdio-minimal-console-only": true,
             "platform.stdio-flush-at-exit": false,
-            "target.c_lib": "small",
             "target.custom-tickers": false,
             "target.printf_lib": "minimal-printf"
         },
