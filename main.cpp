@@ -18,9 +18,21 @@ LCD_ST7735 disp(
 void btn_pressed() {
     led1 = !led1;
     if (led1) {
-        disp.fillRect(32, 32, 96, 96, Color565::Fuchsia);
+        disp.fillRect(
+            disp.getWidth() / 2 - 16,
+            disp.getHeight() / 2 - 16,
+            disp.getWidth() / 2 + 16,
+            disp.getHeight() / 2 + 16,
+            Color565::Fuchsia
+        );
     } else {
-        disp.fillRect(32, 32, 96, 96, Color565::Aqua);
+        disp.fillRect(
+            disp.getWidth() / 2 - 16,
+            disp.getHeight() / 2 - 16,
+            disp.getWidth() / 2 + 16,
+            disp.getHeight() / 2 + 16,
+            Color565::Aqua
+        );
     }
 }
 
