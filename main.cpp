@@ -39,6 +39,5 @@ int main() {
     testDisplayST7735(disp);
 
     btn.setSampleFrequency();
-    //~queue->call_every(20ms, read_joystick);
     queue->dispatch_forever();
 }
