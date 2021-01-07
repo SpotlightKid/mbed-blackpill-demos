@@ -32,7 +32,7 @@ Connections (for "USB to TTL" adapter board):
     TX(D)                   (P)A10
     RST                     <not connected>
 
-Press and hold the BOOT1 button, then press the NRST button and let go of it first, then the BOOT1
+Press and hold the BOOT0 button, then press the NRST button and let go of it first, then the BOOT0
 button.
 
 Then run `stm32flash`:
@@ -87,8 +87,8 @@ serial interface and the overall procedure is probably the fastest, because hook
 cable just needs as few seconds.
 
 To get the board in DFU mode, connect the USB cable to your computer and the board's USB-C port and
-then use the same procedure as activating the serial bootloader: Press and hold the BOOT1 button,
-then press NRST button and let go of it first, then the BOOT1 button.
+then use the same procedure as activating the serial bootloader: Press and hold the BOOT0 button,
+then press NRST button and let go of it first, then the BOOT0 button.
 
 You can check whether this was successfull by running the `lsusb` command. The output should
 constain a line ending with:
