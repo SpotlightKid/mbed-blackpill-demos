@@ -244,10 +244,8 @@ class LCD_ST7735 {
     int _height;
     Orientation _orientation;
     bool _flip;
-    uint8_t _foregroundColorHigh;
-    uint8_t _foregroundColorLow;
-    uint8_t _backgroundColorHigh;
-    uint8_t _backgroundColorLow;
+    uint16_t _foregroundColor;
+    uint16_t _backgroundColor;
 
    private:
     DigitalOut _cs;

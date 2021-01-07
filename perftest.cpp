@@ -28,7 +28,8 @@ int testDisplayST7735(LCD_ST7735 &disp) {
     disp.setOrientation(LCD_ST7735::Rotate270, false);
     disp.setForegroundColor(Color565::Blue);
     disp.setBackgroundColor(Color565::Black);
-    disp.clearScreen();
+    disp.clearScreen(Color565::Blue);
+    wait_us(2000000);
 
     // text
     iStartUs = tPerformance.elapsed_time().count();

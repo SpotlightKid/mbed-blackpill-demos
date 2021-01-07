@@ -30,10 +30,7 @@ int main() {
 
     led1 = 0;
 
-    disp.setBackgroundColor(Color565::Yellow);
-    disp.setBackgroundColor(Color565::Red);
     disp.initDisplay();
-    disp.clearScreen(Color565::Black);
 
     btn.mode(PullUp);
     btn.setSamplesTillAssert(3);

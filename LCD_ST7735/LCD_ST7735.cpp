@@ -56,12 +56,15 @@ int LCD_ST7735::getWidth() { return _width; }
 int LCD_ST7735::getHeight() { return _height; }
 
 void LCD_ST7735::clearScreen(uint16_t color) {
+    uint16_t pixel[320];
+
     clipRect(0, 0, _width - 1, _height - 1);
     beginBatchCommand(CMD_RAMWR);
-    uint8_t colorHigh = color >> 8;
-    uint8_t colorLow = color;
-    for (int i = 0; i < _width * _height * 2; ++i) {
-        writeBatchData(colorHigh, colorLow);
+    for (int i = 0; i < _height; i++) {
+        for (int j = 0; j < _width; j++) {
+            pixel[j] = color;
+        }
+        spi_write((uint8_t*)pixel, _width * 2);
     }
     endBatchCommand();
 }
@@ -183,11 +186,9 @@ void LCD_ST7735::fillRect(int x1, int y1, int x2, int y2, uint16_t fillColor) {
 
     clipRect(x1, y1, x2, y2);
     int c = (((x2 - x1) + 1) * ((y2 - y1) + 1));
-    uint8_t colorHigh = fillColor >> 8;
-    uint8_t colorLow = fillColor;
     beginBatchCommand(CMD_RAMWR);
     while (c--) {
-        writeBatchData(colorHigh, colorLow);
+        writeBatchData(fillColor);
     }
     endBatchCommand();
 }
@@ -206,11 +207,9 @@ void LCD_ST7735::fillRect(int x1, int y1, int x2, int y2, uint16_t borderColor,
         int c = (((x2 - x1) + 1) * ((y2 - y1) + 1));
 
         clipRect(x1, y1, x2, y2);
-        uint8_t colorHigh = fillColor >> 8;
-        uint8_t colorLow = fillColor;
         beginBatchCommand(CMD_RAMWR);
         while (c--) {
-            writeBatchData(colorHigh, colorLow);
+            writeBatchData(fillColor);
         }
         endBatchCommand();
     }
@@ -325,13 +324,11 @@ void LCD_ST7735::drawBitmap(int x, int y, const uint16_t *pbmp, int srcX,
 }
 
 void LCD_ST7735::setForegroundColor(uint16_t color) {
-    _foregroundColorHigh = color >> 8;
-    _foregroundColorLow = color;
+    _foregroundColor = color;
 }
 
 void LCD_ST7735::setBackgroundColor(uint16_t color) {
-    _backgroundColorHigh = color >> 8;
-    _backgroundColorLow = color;
+    _backgroundColor = color;
 }
 
 void LCD_ST7735::drawString(const uint8_t *pFont, int x, int y,
@@ -374,10 +371,8 @@ void LCD_ST7735::drawVertLine(int x1, int y1, int y2, uint16_t color) {
     clipRect(x1, y1, x1, y2);
     beginBatchCommand(CMD_RAMWR);
     int c = (y2 - y1) << 1;
-    uint8_t colorHigh = color >> 8;
-    uint8_t colorLow = color;
     for (int i = 0; i < c; ++i) {
-        writeBatchData(colorHigh, colorLow);
+        writeBatchData(color);
     }
     endBatchCommand();
 }
@@ -386,10 +381,8 @@ void LCD_ST7735::drawHorizLine(int x1, int y1, int x2, uint16_t color) {
     clipRect(x1, y1, x2, y1);
     beginBatchCommand(CMD_RAMWR);
     int c = (x2 - x1) << 1;
-    uint8_t colorHigh = color >> 8;
-    uint8_t colorLow = color;
     for (int i = 0; i < c; ++i) {
-        writeBatchData(colorHigh, colorLow);
+        writeBatchData(color);
     }
     endBatchCommand();
 }
@@ -406,8 +399,7 @@ void LCD_ST7735::drawChar(const uint8_t *pFont, int x, int y, char c, uint8_t w,
     // Render top spacing
     for (int r = 0; r < topPad; ++r) {
         for (int c = 0; c < w + leftPad + rightPad; ++c) {
-            writeBatchData(_backgroundColorHigh);
-            writeBatchData(_backgroundColorLow);
+            writeBatchData(_backgroundColor);
         }
     }
 
@@ -417,32 +409,27 @@ void LCD_ST7735::drawChar(const uint8_t *pFont, int x, int y, char c, uint8_t w,
 
         // Render left spacing
         for (int c = 0; c < leftPad; ++c) {
-            writeBatchData(_backgroundColorHigh);
-            writeBatchData(_backgroundColorLow);
+            writeBatchData(_backgroundColor);
         }
         for (int c = 0; c < w; ++c) {
             if (b & 0x80) {
-                writeBatchData(_foregroundColorHigh);
-                writeBatchData(_foregroundColorLow);
+                writeBatchData(_foregroundColor);
             } else {
-                writeBatchData(_backgroundColorHigh);
-                writeBatchData(_backgroundColorLow);
+                writeBatchData(_backgroundColor);
             }
 
             b <<= 1;
         }
 
         for (int c = 0; c < rightPad; ++c) {
-            writeBatchData(_backgroundColorHigh);
-            writeBatchData(_backgroundColorLow);
+            writeBatchData(_backgroundColor);
         }
     }
 
     // Render bottom spacing
     for (int r = 0; r < bottomPad; ++r) {
         for (int c = 0; c < w + leftPad + rightPad; ++c) {
-            writeBatchData(_backgroundColorHigh);
-            writeBatchData(_backgroundColorLow);
+            writeBatchData(_backgroundColor);
         }
     }
     endBatchCommand();
@@ -501,14 +488,6 @@ void LCD_ST7735::initDisplay() {
         0x37, 0x32, 0x29, 0x2d,
         0x29, 0x25, 0x2B, 0x39,
         0x00, 0x01, 0x03, 0x10
-        //~0x0f, 0x1a,
-        //~0x0f, 0x18,
-        //~0x2f, 0x28,
-        //~0x20, 0x22,
-        //~0x1f, 0x1b,
-        //~0x23, 0x37,
-        //~0x00, 0x07,
-        //~0x02, 0x10
     };
     write(CMD_GAMCTRP1, GAMCTRP1, 16);
 
@@ -518,23 +497,8 @@ void LCD_ST7735::initDisplay() {
         0x2E, 0x2C, 0x29, 0x2D,
         0x2E, 0x2E, 0x37, 0x3F,
         0x00, 0x00, 0x02, 0x10
-        //~0x0f, 0x1b,
-        //~0x0f, 0x17,
-        //~0x33, 0x2c,
-        //~0x29, 0x2e,
-        //~0x30, 0x30,
-        //~0x39, 0x3f,
-        //~0x00, 0x07,
-        //~0x03, 0x10
     };
     write(CMD_GAMCTRN1, GAMCTRN1, 16);
-
-    // ???
-    // write(CMD_EXTCTRL, 0x01);
-
-    // ???
-    // Disable RAM power save
-    // write(0xf6, 0x00);
 
     // Normal display on, no args, w/delay 10 ms
     writeCommand(CMD_NORON);

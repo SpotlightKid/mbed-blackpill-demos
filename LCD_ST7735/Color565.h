@@ -64,7 +64,8 @@ class Color565 {
      * @param b Blue component
      */
     static uint16_t fromRGB(uint8_t r, uint8_t g, uint8_t b) {
-        return ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3);
+        uint16_t color = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3);
+        return (color >> 8) | (color << 8);
     }
 
    private:
