@@ -2,18 +2,15 @@
 #include "mbed.h"
 #include "LCD_ST7735.h"
 
-LCD_ST7735::LCD_ST7735(PinName mosiPin, PinName misoPin, PinName clkPin,
-                       PinName csPin, PinName rsPin, PinName rstPin,
+LCD_ST7735::LCD_ST7735(PinName csPin, PinName rsPin, PinName rstPin,
                        PanelColorFilter colorFilter)
-    : _spi(mosiPin, misoPin, clkPin),
-      _cs(csPin, 1),
+    : _cs(csPin, 1),
       _rs(rsPin, 0),
       _rst(rstPin, 1),
       _colorFilter(colorFilter) {
     _cs = 1;
-    _spi.format(8, 3);
-    _spi.frequency(25000000);
 
+    spi_init();
     setForegroundColor(0xffff);
     setBackgroundColor(0x0000);
 }
@@ -70,9 +67,9 @@ void LCD_ST7735::clearScreen(uint16_t color) {
 }
 
 void LCD_ST7735::setPixel(int x, int y, uint16_t color) {
-    const uint8_t CASET[] = {0, (uint8_t)x, 0, (uint8_t)x};
+    uint8_t CASET[] = {0, (uint8_t)x, 0, (uint8_t)x};
     write(CMD_CASET, CASET, 4);
-    const uint8_t RASET[] = {0, (uint8_t)y, 0, (uint8_t)y};
+    uint8_t RASET[] = {0, (uint8_t)y, 0, (uint8_t)y};
     write(CMD_RASET, RASET, 4);
     write16(CMD_RAMWR, color);
 }
@@ -462,23 +459,23 @@ void LCD_ST7735::initDisplay() {
     writeCommand(CMD_SLPOUT);
     wait_us(250 * 1000);
 
-    static const uint8_t FRMCTR1[] = {0x01, 0x2c, 0x2d};
+    uint8_t FRMCTR1[] = {0x01, 0x2c, 0x2d};
     write(CMD_FRMCTR1, FRMCTR1, 3);
-    static const uint8_t FRMCTR2[] = {0x01, 0x2c, 0x2d};
+    uint8_t FRMCTR2[] = {0x01, 0x2c, 0x2d};
     write(CMD_FRMCTR2, FRMCTR2, 3);
-    static const uint8_t FRMCTR3[] = {0x01, 0x2c, 0x2d, 0x01, 0x2c, 0x2d};
+    uint8_t FRMCTR3[] = {0x01, 0x2c, 0x2d, 0x01, 0x2c, 0x2d};
     write(CMD_FRMCTR3, FRMCTR3, 6);
 
     write(CMD_INVCTR, 0x07);
 
-    static const uint8_t PWCTR1[] = {0xa2, 0x02, 0x84};
+    uint8_t PWCTR1[] = {0xa2, 0x02, 0x84};
     write(CMD_PWCTR1, PWCTR1, 3);
     write(CMD_PWCTR2, 0xc5);
-    static const uint8_t PWCTR3[] = {0x0a, 0x00};
+    uint8_t PWCTR3[] = {0x0a, 0x00};
     write(CMD_PWCTR3, PWCTR3, 2);
-    static const uint8_t PWCTR4[] = {0x8a, 0x2a};
+    uint8_t PWCTR4[] = {0x8a, 0x2a};
     write(CMD_PWCTR4, PWCTR4, 2);
-    static const uint8_t PWCTR5[] = {0x8a, 0xee};
+    uint8_t PWCTR5[] = {0x8a, 0xee};
     write(CMD_PWCTR5, PWCTR5, 2);
 
     write(CMD_VMCTR1, 0x0e);
@@ -491,15 +488,15 @@ void LCD_ST7735::initDisplay() {
     write(CMD_COLMOD, 0x05);
 
     // Column addr set
-    static const uint8_t CASET[] = {0x00, 0x00, 0x00, (uint8_t)(_width - 1)};
+    uint8_t CASET[] = {0x00, 0x00, 0x00, (uint8_t)(_width - 1)};
     write(CMD_CASET, CASET, 4);
     // Row addr set
-    static const uint8_t RASET[] = {0x00, 0x00, 0x00, (uint8_t)(_height - 1)};
+    uint8_t RASET[] = {0x00, 0x00, 0x00, (uint8_t)(_height - 1)};
     write(CMD_RASET, RASET, 4);
 
     // Gama sequence
     // 1: Magical unicorn dust, 16 args, no delay
-    static const uint8_t GAMCTRP1[] = {
+    uint8_t GAMCTRP1[] = {
         0x02, 0x1c, 0x07, 0x12,
         0x37, 0x32, 0x29, 0x2d,
         0x29, 0x25, 0x2B, 0x39,
@@ -516,7 +513,7 @@ void LCD_ST7735::initDisplay() {
     write(CMD_GAMCTRP1, GAMCTRP1, 16);
 
     // 2: Sparkles and rainbows, 16 args, no delay
-    static const uint8_t GAMCTRN1[] = {
+    uint8_t GAMCTRN1[] = {
         0x03, 0x1d, 0x07, 0x06,
         0x2E, 0x2C, 0x29, 0x2D,
         0x2E, 0x2E, 0x37, 0x3F,
@@ -564,33 +561,31 @@ void LCD_ST7735::clipRect(int x1, int y1, int x2, int y2) {
     uint8_t x1h = (uint8_t)(x1 >> 8);
     uint8_t x2l = (uint8_t)x2;
     uint8_t x2h = (uint8_t)(x2 >> 8);
-    const uint8_t CASET[] = {x1h, x1l, x2h, x2l};
+    uint8_t CASET[] = {x1h, x1l, x2h, x2l};
     write(CMD_CASET, CASET, 4);
 
     uint8_t y1l = (uint8_t)y1;
     uint8_t y1h = (uint8_t)(y1 >> 8);
     uint8_t y2l = (uint8_t)y2;
     uint8_t y2h = (uint8_t)(y2 >> 8);
-    const uint8_t RASET[] = {y1h, y1l, y2h, y2l};
+    uint8_t RASET[] = {y1h, y1l, y2h, y2l};
     write(CMD_RASET, RASET, 4);
 }
 
 void LCD_ST7735::writeCommand(uint8_t cmd) {
     _cs = 0;
     _rs = 0;
-    _spi.write(cmd);
+    spi_write(cmd);
     _cs = 1;
 }
 
-void LCD_ST7735::write(uint8_t cmd, const uint8_t data[], size_t dataLen) {
+void LCD_ST7735::write(uint8_t cmd, uint8_t* data, uint16_t dataLen) {
     _cs = 0;
     _rs = 0;
-    _spi.write(cmd);
+    spi_write(cmd);
     if (data != NULL && dataLen > 0) {
         _rs = 1;
-        for (size_t i = 0; i < dataLen; ++i) {
-            _spi.write(data[i]);
-        }
+        spi_write(data, dataLen);
         _rs = 0;
     }
     _cs = 1;
@@ -599,9 +594,9 @@ void LCD_ST7735::write(uint8_t cmd, const uint8_t data[], size_t dataLen) {
 void LCD_ST7735::write(uint8_t cmd, uint8_t data) {
     _cs = 0;
     _rs = 0;
-    _spi.write(cmd);
+    spi_write(cmd);
     _rs = 1;
-    _spi.write(data);
+    spi_write(data);
     _rs = 0;
     _cs = 1;
 }
@@ -609,10 +604,9 @@ void LCD_ST7735::write(uint8_t cmd, uint8_t data) {
 void LCD_ST7735::write16(uint8_t cmd, uint16_t data) {
     _cs = 0;
     _rs = 0;
-    _spi.write(cmd);
+    spi_write(cmd);
     _rs = 1;
-    _spi.write(data >> 8);
-    _spi.write(data);
+    spi_writew(data);
     _rs = 0;
     _cs = 1;
 }
@@ -620,20 +614,19 @@ void LCD_ST7735::write16(uint8_t cmd, uint16_t data) {
 void LCD_ST7735::beginBatchCommand(uint8_t cmd) {
     _cs = 0;
     _rs = 0;
-    _spi.write(cmd);
+    spi_write(cmd);
     _rs = 1;
 }
 
-void LCD_ST7735::writeBatchData(uint8_t data) { _spi.write(data); }
+void LCD_ST7735::writeBatchData(uint8_t data) { spi_write(data); }
 
 void LCD_ST7735::writeBatchData(uint8_t dataHigh, uint8_t dataLow) {
-    _spi.write(dataHigh);
-    _spi.write(dataLow);
+    spi_write(dataHigh);
+    spi_write(dataLow);
 }
 
 void LCD_ST7735::writeBatchData(uint16_t data) {
-    _spi.write(data >> 8);
-    _spi.write(data);
+    spi_writew(data);
 }
 
 void LCD_ST7735::endBatchCommand() {

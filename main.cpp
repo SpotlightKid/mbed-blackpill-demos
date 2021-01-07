@@ -9,9 +9,6 @@
 DigitalOut  led1(LED_BLUE);
 PinDetect   btn(USER_BUTTON);
 LCD_ST7735 disp(
-    SPI_MOSI,   // MOSI
-    NC,         // MISO (unused)
-    SPI_SCK,    // SCK/CLK
     PA_4,       // SS/CS
     PC_14,      // RS/DS/DC
     PC_15,      // RST
@@ -37,7 +34,6 @@ int main() {
     disp.setBackgroundColor(Color565::Red);
     disp.initDisplay();
     disp.clearScreen(Color565::Black);
-    disp.fillRect(32, 32, 96, 96, Color565::Aqua);
 
     btn.mode(PullUp);
     btn.setSamplesTillAssert(3);

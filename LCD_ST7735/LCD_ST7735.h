@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "spidma.h"
+
 /**
  * LCD_ST7735 is a simple driver for the ST7735 LCD controller.
  * It provides basic drawing primitives sa well as text and font capabilities.
@@ -38,16 +40,12 @@ class LCD_ST7735 {
 
    public:
     /**Creates an instance of the LCD_ST7735 driver
-     * @param mosiPin SPI channel MOSI pin
-     * @param misoPin SPI channel MISO pin
-     * @param clkPin SPI channel clock pin
      * @param csPin SPI chip select pin
      * @param rsPin Pin used to put the display controller into data mode
      * @param rstPin Pin used to reset the display controller
      * @param colorFilter Type of color filter of the panel, BGR (default) or RGB
      */
-    LCD_ST7735(PinName mosiPin, PinName misoPin, PinName clkPin, PinName csPin,
-               PinName rsPin, PinName rstPin,
+    LCD_ST7735(PinName csPin, PinName rsPin, PinName rstPin,
                PanelColorFilter colorFilter = BGR);
 
     /** Initialize the display */
@@ -215,7 +213,7 @@ class LCD_ST7735 {
 
    protected:
     void writeCommand(uint8_t cmd);
-    void write(uint8_t cmd, const uint8_t data[], size_t dataLen);
+    void write(uint8_t cmd, uint8_t* data, uint16_t dataLen);
     void write(uint8_t cmd, uint8_t data);
     void write16(uint8_t cmd, uint16_t data);
 
@@ -252,7 +250,6 @@ class LCD_ST7735 {
     uint8_t _backgroundColorLow;
 
    private:
-    SPI _spi;
     DigitalOut _cs;
     DigitalOut _rs;
     DigitalOut _rst;
