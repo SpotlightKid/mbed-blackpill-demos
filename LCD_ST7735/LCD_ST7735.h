@@ -9,6 +9,18 @@
 
 #include "spidma.h"
 
+#ifndef MIN
+#define MIN(a,b) ( (a) < (b) ? (a) : (b) )
+#endif
+
+#ifndef MAX
+#define MAX(a,b) ( (a) > (b) ? (a) : (b) )
+#endif
+
+#define ST7735_HEIGHT 160
+#define ST7735_WIDTH  128
+#define ST7735_MAX_DIM MAX(ST7735_HEIGHT, ST7735_WIDTH)
+
 /**
  * LCD_ST7735 is a simple driver for the ST7735 LCD controller.
  * It provides basic drawing primitives sa well as text and font capabilities.

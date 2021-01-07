@@ -25,26 +25,26 @@ void LCD_ST7735::setOrientation(Orientation orientation, bool flip) {
     uint8_t madctlData = _colorFilter;
     switch (orientation) {
         case Rotate0:
-            _width = 128;
-            _height = 160;
+            _width = ST7735_WIDTH;
+            _height = ST7735_HEIGHT;
             madctlData |= flip ? mx : 0;
             break;
 
         case Rotate90:
-            _width = 160;
-            _height = 128;
+            _width = ST7735_HEIGHT;
+            _height = ST7735_WIDTH;
             madctlData |= flip ? my | mv | mx : mv | mx;
             break;
 
         case Rotate180:
-            _width = 128;
-            _height = 160;
+            _width = ST7735_WIDTH;
+            _height = ST7735_HEIGHT;
             madctlData |= flip ? my : mx | my;
             break;
 
         case Rotate270:
-            _width = 160;
-            _height = 128;
+            _width = ST7735_HEIGHT;
+            _height = ST7735_WIDTH;
             madctlData |= flip ? mv : mv | my;
             break;
     }
@@ -56,7 +56,7 @@ int LCD_ST7735::getWidth() { return _width; }
 int LCD_ST7735::getHeight() { return _height; }
 
 void LCD_ST7735::clearScreen(uint16_t color) {
-    uint16_t pixel[320];
+    uint16_t pixel[ST7735_HEIGHT];
 
     clipRect(0, 0, _width - 1, _height - 1);
     beginBatchCommand(CMD_RAMWR);
@@ -181,35 +181,42 @@ void LCD_ST7735::drawEllipse(int x, int y, int rx, int ry, uint16_t color) {
     }
 }
 void LCD_ST7735::fillRect(int x1, int y1, int x2, int y2, uint16_t fillColor) {
+    uint16_t pixel[ST7735_MAX_DIM];
+
     if (x1 > x2) swap(x1, x2);
     if (y1 > y2) swap(y1, y2);
 
     clipRect(x1, y1, x2, y2);
-    int c = (((x2 - x1) + 1) * ((y2 - y1) + 1));
     beginBatchCommand(CMD_RAMWR);
-    while (c--) {
-        writeBatchData(fillColor);
+    int width = MIN(x2 - x1 + 1, _width);
+    int height = MIN(y2 - y1 + 1, _height);
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            pixel[j] = fillColor;
+        }
+        spi_write((uint8_t*)pixel, width * 2);
     }
     endBatchCommand();
 }
 
 void LCD_ST7735::fillRect(int x1, int y1, int x2, int y2, uint16_t borderColor,
                           uint16_t fillColor) {
+    uint16_t pixel[ST7735_MAX_DIM];
     if (x1 > x2) swap(x1, x2);
     if (y1 > y2) swap(y1, y2);
 
-    drawRect(x1, y1, x2, y2, borderColor);
-    ++x1;
-    ++y1;
-    --x2;
-    --y2;
+    drawRect(x1++, y1++, x2--, y2--, borderColor);
     if (x2 >= x1 && y2 >= y1) {
-        int c = (((x2 - x1) + 1) * ((y2 - y1) + 1));
+        int width = MIN(x2 - x1 + 1, _width);
+        int height = MIN(y2 - y1 + 1, _height);
 
         clipRect(x1, y1, x2, y2);
         beginBatchCommand(CMD_RAMWR);
-        while (c--) {
-            writeBatchData(fillColor);
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                pixel[j] = fillColor;
+            }
+            spi_write((uint8_t*)pixel, width * 2);
         }
         endBatchCommand();
     }
