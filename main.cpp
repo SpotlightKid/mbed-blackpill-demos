@@ -1,15 +1,13 @@
 #include "mbed.h"
-//~#include "Joystick.h"
 #include "PinDetect.h"
 #include "LCD_ST7735.h"
 #include "Color565.h"
+#include "perftest.h"
 
 #define THRESHOLD 0.008
 
 DigitalOut  led1(LED_BLUE);
 PinDetect   btn(USER_BUTTON);
-//~Joystick    stk(A1, A2);
-//~Vector2D old_coord = {0.0f, 0.0f};
 LCD_ST7735 disp(
     SPI_MOSI,   // MOSI
     NC,         // MISO (unused)
@@ -21,7 +19,6 @@ LCD_ST7735 disp(
 );
 
 void btn_pressed() {
-    printf("Button pressed\r\n");
     led1 = !led1;
     if (led1) {
         disp.fillRect(32, 32, 96, 96, Color565::Fuchsia);
@@ -29,15 +26,6 @@ void btn_pressed() {
         disp.fillRect(32, 32, 96, 96, Color565::Aqua);
     }
 }
-
-//~void read_joystick(void) {
-    //~Vector2D coord = stk.get_coord();
-    //~if (fabs(coord.x - old_coord.x) > THRESHOLD || fabs(coord.y - old_coord.y) > THRESHOLD) {
-        //~printf("(%d, %d)\n", (int)(coord.x * 512), (int)(coord.y * 512));
-        //~old_coord.x = coord.x;
-        //~old_coord.y = coord.y;
-    //~}
-//~}
 
 int main() {
     // Request the shared queue
@@ -55,7 +43,7 @@ int main() {
     btn.setSamplesTillAssert(3);
     btn.attach_asserted(queue->event(btn_pressed));
 
-    //~stk.init();
+    testDisplayST7735(disp);
 
     btn.setSampleFrequency();
     //~queue->call_every(20ms, read_joystick);
