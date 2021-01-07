@@ -375,22 +375,28 @@ void LCD_ST7735::measureString(const uint8_t *pFont, const char *pString,
 }
 
 void LCD_ST7735::drawVertLine(int x1, int y1, int y2, uint16_t color) {
+    uint16_t pixel[ST7735_MAX_DIM];
+    if (y1 > y2) swap(y1, y2);
     clipRect(x1, y1, x1, y2);
     beginBatchCommand(CMD_RAMWR);
-    int c = (y2 - y1) << 1;
-    for (int i = 0; i < c; ++i) {
-        writeBatchData(color);
+    int height = MIN(y2 - y1 + 1, _height);
+    for (int i = 0; i < height; i++) {
+        pixel[i] = color;
     }
+    spi_write((uint8_t*)pixel, height * 2);
     endBatchCommand();
 }
 
 void LCD_ST7735::drawHorizLine(int x1, int y1, int x2, uint16_t color) {
+    uint16_t pixel[ST7735_MAX_DIM];
+    if (x1 > x2) swap(x1, x2);
     clipRect(x1, y1, x2, y1);
     beginBatchCommand(CMD_RAMWR);
-    int c = (x2 - x1) << 1;
-    for (int i = 0; i < c; ++i) {
-        writeBatchData(color);
+    int width = MIN(x2 - x1 + 1, _width);
+    for (int i = 0; i < width; i++) {
+        pixel[i] = color;
     }
+    spi_write((uint8_t*)pixel, width * 2);
     endBatchCommand();
 }
 
@@ -589,7 +595,9 @@ void LCD_ST7735::beginBatchCommand(uint8_t cmd) {
     _rs = 1;
 }
 
-void LCD_ST7735::writeBatchData(uint8_t data) { spi_write(data); }
+void LCD_ST7735::writeBatchData(uint8_t data) {
+    spi_write(data);
+}
 
 void LCD_ST7735::writeBatchData(uint8_t dataHigh, uint8_t dataLow) {
     spi_write(dataHigh);
