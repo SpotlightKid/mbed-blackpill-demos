@@ -3,7 +3,9 @@ Black Pill mbed LED Switch Example
 
 A simple example firmware for the "Black Pill" board based on an STM32F411CEU6 MCU using mbed OS.
 
-This basic example switches the on-board LED on and off on each USER button press.
+We will use GCC ARM on the command line on Arch Linux.
+
+This basic example toggles the on-board LED on and off on each USER button press.
 
 ## Compilation
 
@@ -12,10 +14,13 @@ export PROFILE=develop
 ./build.sh
 ```
 
+See also these [notes](./notes-mbed-arch.md) on setting up your mbed development environment on
+Arch Linux.
+
 ## Flashing
 
-* Connect USB
-* Press and hold BOOT0, then press NRST, release NRST, release BOOT0
+* Connect USB.
+* Press and hold BOOT0, then press NRST, release NRST, release BOOT0.
 
 ```
 export PROFILE=develop
